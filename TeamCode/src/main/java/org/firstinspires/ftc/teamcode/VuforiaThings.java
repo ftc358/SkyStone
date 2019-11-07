@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -21,6 +23,10 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 public abstract class VuforiaThings extends LinearOpMode {
 
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     private static final boolean PHONE_IS_PORTRAIT = false;
 
@@ -38,7 +44,7 @@ public abstract class VuforiaThings extends LinearOpMode {
     private float phoneYRotate = 0;
     private float phoneZRotate = 0;
 
-    public void lookForThings() {
+    public float lookForThings() {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -79,12 +85,14 @@ public abstract class VuforiaThings extends LinearOpMode {
 
         targetsSkyStone.activate();
 
+        FtcDashboard.getInstance().startCameraStream(vuforia, 0);
+
         targetVisible = false;
 
         while (!targetVisible) {
 
             if (((VuforiaTrackableDefaultListener) stoneTarget.getListener()).isVisible()) {
-                telemetry.addData("Visible Target", stoneTarget.getName());
+                dashboardTelemetry.addData("Visible Target", stoneTarget.getName());
                 targetVisible = true;
 
                 OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) stoneTarget.getListener()).getUpdatedRobotLocation();
@@ -95,19 +103,20 @@ public abstract class VuforiaThings extends LinearOpMode {
 
             if (targetVisible) {
                 VectorF translation = lastLocation.getTranslation();
-                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                dashboardTelemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
 
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
-                telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                dashboardTelemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
             } else {
-                telemetry.addData("Visible Target", "none");
+                dashboardTelemetry.addData("Visible Target", "none");
             }
-            telemetry.update();
+            dashboardTelemetry.update();
 
         }
 
         vuforia.close();
+        return (lastLocation.getTranslation().get(1) / mmPerInch);
 
     }
 

@@ -12,16 +12,15 @@ public class VuforiaTesting extends VuforiaThings {
         while (opModeIsActive()) {
 
             if (gamepad1.a) {
-                lookForThings();
+                dashboardTelemetry.addData("Y (in)", "%.2f", lookForThings());
+                dashboardTelemetry.update();
             }
             else if (gamepad1.b) {
-                telemetry.addData("WTF", "oh no");
-                telemetry.update();
+                dashboardTelemetry.addData("WTF", "oh no");
+                dashboardTelemetry.update();
             }
-
 
         }
 
-//        targetsSkyStone.deactivate();
     }
 }
