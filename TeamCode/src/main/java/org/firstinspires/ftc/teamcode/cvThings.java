@@ -40,6 +40,7 @@ public class cvThings extends LinearOpMode {
     public static int fromBottom = 0;
     public static int stoneHeight = 40;
 
+    SamplePipeline samplePipeline;
     Bitmap bmp = null;
 
     Runnable submitImage = new Runnable() {
@@ -55,45 +56,42 @@ public class cvThings extends LinearOpMode {
         phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
 
         phoneCam.openCameraDevice();
-        phoneCam.setPipeline(new SamplePipeline());
-        phoneCam.startStreaming(frameHeight, frameWidth, OpenCvCameraRotation.UPRIGHT);
+        samplePipeline = new SamplePipeline();
+        phoneCam.setPipeline(samplePipeline);
 
-        ExecutorService thingy = Executors.newSingleThreadExecutor();
+        ExecutorService networking = Executors.newSingleThreadExecutor();
 
         waitForStart();
 
         while (opModeIsActive()) {
 
             if (gamepad1.a) {
+                phoneCam.startStreaming(frameHeight, frameWidth, OpenCvCameraRotation.UPRIGHT);
+            } else if (gamepad1.b) {
                 phoneCam.stopStreaming();
             } else if (gamepad1.x) {
-                phoneCam.pauseViewport();
-            } else if (gamepad1.y) {
-                phoneCam.resumeViewport();
+                phoneCam.closeCameraDevice();
             }
 
-            thingy.submit(submitImage);
+            networking.submit(submitImage);
 
-            sleep(100);
+            telemetry.addData("skystonePosition", samplePipeline.getPosition());
+            telemetry.update();
         }
     }
 
 
     class SamplePipeline extends OpenCvPipeline {
-//        cols() = 240 = frameHeight
-//        rows() = 320 = frameWidth
 
-        final private int rectWidth = frameWidth / 3;
-        final private int rectHeight = frameHeight / 3;
-
+        int skystonePosition;
         Scalar green = new Scalar(0, 255, 0);
 
         @Override
         public Mat processFrame(Mat input) {
 
-            Rect rectLeft = new Rect(fromBottom, 0, stoneHeight, rectHeight);
-            Rect rectMiddle = new Rect(fromBottom, rectHeight, stoneHeight, rectHeight);
-            Rect rectRight = new Rect(fromBottom, 2 * rectHeight, stoneHeight, rectHeight);
+            Rect rectLeft = new Rect(fromBottom, 0, stoneHeight, frameHeight / 3);
+            Rect rectMiddle = new Rect(fromBottom, frameHeight / 3, stoneHeight, frameHeight / 3);
+            Rect rectRight = new Rect(fromBottom, 2 * frameHeight / 3, stoneHeight, frameHeight / 3);
 
             Mat left = new Mat(input, rectLeft);
             Mat middle = new Mat(input, rectMiddle);
@@ -111,24 +109,18 @@ public class cvThings extends LinearOpMode {
             Color.RGBToHSV((int) middleMean.val[0], (int) middleMean.val[1], (int) middleMean.val[2], middleHsv);
             Color.RGBToHSV((int) rightMean.val[0], (int) rightMean.val[1], (int) rightMean.val[2], rightHsv);
 
-//            telemetry.addData("leftHSV", "%.2f, %.2f, %.2f", leftHsv[0], leftHsv[1], leftHsv[2]);
-//            telemetry.addData("middleHSV", "%.2f, %.2f, %.2f", middleHsv[0], middleHsv[1], middleHsv[2]);
-//            telemetry.addData("rightHSV", "%.2f, %.2f, %.2f", rightHsv[0], rightHsv[1], rightHsv[2]);
-
             ArrayList<Float> values = new ArrayList<>();
 
             values.add(leftHsv[2]);
             values.add(middleHsv[2]);
             values.add(rightHsv[2]);
 
-            telemetry.addData("skystone", values.indexOf(Collections.min(values)));
-
-            telemetry.update();
+            skystonePosition = values.indexOf(Collections.min(values));
 
             // drawing things on the screen so that things can be seen on screen
-            Imgproc.rectangle(input, rectLeft, green, 2);
-            Imgproc.rectangle(input, rectMiddle, green, 2);
-            Imgproc.rectangle(input, rectRight, green, 2);
+            Imgproc.rectangle(input, rectLeft, green, 1);
+            Imgproc.rectangle(input, rectMiddle, green, 1);
+            Imgproc.rectangle(input, rectRight, green, 1);
 
             try {
                 bmp = Bitmap.createBitmap(input.cols(), input.rows(), Bitmap.Config.ARGB_8888);
@@ -138,7 +130,13 @@ public class cvThings extends LinearOpMode {
             }
 
             return input;
-
         }
+
+        public int getPosition() {
+            return skystonePosition;
+        }
+
+
     }
 }
+
