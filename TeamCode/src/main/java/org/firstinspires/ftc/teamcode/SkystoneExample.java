@@ -3,12 +3,23 @@ package org.firstinspires.ftc.teamcode;
 //import com.disnodeteam.dogecv.CameraViewDisplay;
 //import com.disnodeteam.dogecv.DogeCV;
 //import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
+<<<<<<< Updated upstream
 //import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+=======
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+>>>>>>> Stashed changes
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 //
 //import org.opencv.core.Rect;
 //
+<<<<<<< Updated upstream
 //@Autonomous(group = "DogeCV")
+=======
+
+@Disabled
+@Autonomous(group = "DogeCV")
+>>>>>>> Stashed changes
 public class SkystoneExample extends OpMode {
 //    private SkystoneDetector detector;
 //

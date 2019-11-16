@@ -26,6 +26,10 @@ public abstract class VuforiaThings extends LinearOpMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
+<<<<<<< Updated upstream
+=======
+    Telemetry telemetry = dashboardTelemetry;
+>>>>>>> Stashed changes
 
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     private static final boolean PHONE_IS_PORTRAIT = false;
@@ -92,7 +96,11 @@ public abstract class VuforiaThings extends LinearOpMode {
         while (!targetVisible) {
 
             if (((VuforiaTrackableDefaultListener) stoneTarget.getListener()).isVisible()) {
+<<<<<<< Updated upstream
                 dashboardTelemetry.addData("Visible Target", stoneTarget.getName());
+=======
+//                telemetry.addData("Visible Target", stoneTarget.getName());
+>>>>>>> Stashed changes
                 targetVisible = true;
 
                 OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) stoneTarget.getListener()).getUpdatedRobotLocation();
@@ -103,6 +111,7 @@ public abstract class VuforiaThings extends LinearOpMode {
 
             if (targetVisible) {
                 VectorF translation = lastLocation.getTranslation();
+<<<<<<< Updated upstream
                 dashboardTelemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
 
@@ -112,6 +121,25 @@ public abstract class VuforiaThings extends LinearOpMode {
                 dashboardTelemetry.addData("Visible Target", "none");
             }
             dashboardTelemetry.update();
+=======
+//                telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+//                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+
+                Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+//                telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+//            } else {
+//                telemetry.addData("Visible Target", "none");
+            }
+//            telemetry.update();
+
+            if (isStopRequested()) {
+                telemetry.addData("isStopRequested", isStopRequested());
+                telemetry.addData("Stop is requested", "Returning arbitrary value");
+                telemetry.update();
+                vuforia.close();
+                return -100;
+            }
+>>>>>>> Stashed changes
 
         }
 

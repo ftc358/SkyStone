@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
+@Disabled
 @Autonomous
 public class java extends LinearOpMode {
 
@@ -14,5 +17,6 @@ public class java extends LinearOpMode {
             telemetry.addData("Hello there", 4396);
             telemetry.update();
         }
+
     }
 }
